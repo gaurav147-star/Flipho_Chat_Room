@@ -4,6 +4,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import Messages from "./dbMessages.js";
+import Rooms from "./dbrooms.js";
 import Pusher from "pusher";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -47,19 +48,37 @@ const db = mongoose.connection;
 db.once("open", () => {
     console.log("DB connected");
 
-    const msgCollection = db.collection("messagecontents");
-    const changeStream = msgCollection.watch();
+    const msgCollection = db.collection("messages");
+    const roomCollection = db.collection("rooms");
 
-    changeStream.on("change", (change) => {
-        console.log("A change occured", change);
+    const changeStreammsg = msgCollection.watch();
+    const changeStreamroom = roomCollection.watch();
+
+    changeStreammsg.on("change", (change) => {
+        console.log("A change occured");
 
         if (change.operationType === "insert") {
             const messageDetails = change.fullDocument;
             pusher.trigger("messages", "inserted", {
+                roomID: messageDetails.roomID,
                 name: messageDetails.name,
                 message: messageDetails.message,
                 timestamp: messageDetails.timestamp,
                 received: messageDetails.received,
+            });
+        } else {
+            console.log("Error triggering Pusher");
+        }
+    });
+
+
+    changeStreamroom.on("change", (change) => {
+        console.log("room added", change);
+
+        if (change.operationType === "insert") {
+            const roomDetails = change.fullDocument;
+            pusher.trigger("rooms", "inserted", {
+                roomname: roomDetails.name
             });
         } else {
             console.log("Error triggering Pusher");
@@ -70,15 +89,22 @@ db.once("open", () => {
 // api routes
 app.get("/", (req, res) => res.status(200).send("hello world"));
 
-app.get("/messages/sync", (req, res) => {
-    Messages.find((err, data) => {
+
+
+
+app.post("/rooms/new", (req, res) => {
+    const dbRoom = req.body;
+    console.log(dbRoom);
+    Rooms.create(dbRoom, (err, data) => {
+        console.log(data);
         if (err) {
             res.status(500).send(err);
         } else {
-            res.status(200).send(data);
+            res.status(201).send(data);
         }
     });
 });
+
 
 app.post("/messages/new", (req, res) => {
     const dbMessage = req.body;
@@ -90,6 +116,44 @@ app.post("/messages/new", (req, res) => {
         }
     });
 });
+
+
+app.get("/messages/sync", (req, res) => {
+    Messages.find((err, data) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(200).send(data);
+        }
+    });
+});
+
+
+app.get("/rooms/sync", (req, res) => {
+    Rooms.find((err, data) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(200).send(data);
+        }
+    });
+});
+
+
+app.get('/rooms/:id', (req, res) => {
+    Rooms.findById(req.params.id)
+        .then(result => {
+            res.status(200).json({
+                roomname: result.roomname,
+            })
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            })
+        })
+})
 
 // listen
 app.listen(port, () => console.log(`Listening on localhost:${port}`));
