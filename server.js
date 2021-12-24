@@ -16,6 +16,11 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
+if (process.env.NODE_ENV==="production") {
+  app.use(express.static("client/build"))
+}
+
+
 const pusher = new Pusher({
     appId: "1320656",
     key: "65a3b0c27b2aca9a9b6e",
