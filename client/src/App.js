@@ -3,9 +3,20 @@ import Chat from './components/Chat';
 import Sidebar from './components/Sidebar';
 import React, { useEffect, useState } from "react";
 import Pusher from "pusher-js";
-import axios from './components/axios';
+import axios from './Axios';
+
+import {
+  BrowserRouter as Router, Switch,
+  Route
+} from 'react-router-dom'
+import { useStateValue } from './StateProvider';
+import Welcome from './components/Welcome';
+import Login from './components/Login';
+
 
 function App() {
+
+  const [{ user }, dispatch] = useStateValue();
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
@@ -21,9 +32,7 @@ function App() {
     });
 
     var channel = pusher.subscribe("messages");
-    channel.bind('inserted', function (newMessage) {
-      // console.log(JSON.stringify(newMessage));
-      // alert(JSON.stringify(newMessage));
+    channel.bind('inserted', (newMessage) => {
       setMessages([...messages, newMessage]);
     });
     return () => {
@@ -33,17 +42,35 @@ function App() {
     // eslint-disable-next-line
   }, [messages])
 
-  console.log(messages);
+  // console.log(messages);
+
+  // console.log(window.innerWidth);
+
   return (
     <div className="App">
-      <div className="app_body">
+      {!user ? (
+        <Login />
+      ) : (
+        <div className="app_body">
 
-        <Sidebar />
-        <Chat messages={messages} />
-      </div>
+          <Router>
+            <Sidebar messages={messages} />
+            <Switch>
+              <Route path="/rooms/:ROOMID">
+                <Chat messages={messages} />
+              </Route>
+              <Route path="/">
+                <Welcome />
+              </Route>
+            </Switch>
+          </Router>
+        </div>
 
+
+      )}
     </div>
   );
+
 }
 
 export default App;

@@ -10,8 +10,10 @@
 }
 
 .sidebarChat_info > h2 {
-  font-size: 16px;
+  font-size: 20px;
   margin-bottom: 8px;
+  /* background-color: black; */
+  text-decoration: none;
 }
 
 .sidebarChat_info {

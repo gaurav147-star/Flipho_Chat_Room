@@ -54,3 +54,7 @@
   background-color: white;
   overflow: scroll;
 }
+
+.profilepic{
+  font-size: 40px !important;
+}

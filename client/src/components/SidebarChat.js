@@ -1,17 +1,20 @@
 import { Avatar } from '@mui/material';
 import React from 'react'
 import "./SidebarChat.css";
+import { Link } from 'react-router-dom'
 
-const SidebarChat = () => {
+const SidebarChat = ({ id, roomname }) => {
     return (
-        <div className='sidebarChat'>
-            <Avatar />
-            <div className="sidebarChat_info">
-                <h2>Room name</h2>
-                <p>This is the last message.</p>
-            </div>
+        <Link style={{"textDecoration":"none","color":"black"}} to={`/rooms/${id}`}>
+            <div className='sidebarChat'>
+                <Avatar />
+                <div className="sidebarChat_info">
+                    <h2>{roomname}</h2>
+                </div>
 
-        </div>
+            </div>
+        </Link>
+
     )
 }
 
