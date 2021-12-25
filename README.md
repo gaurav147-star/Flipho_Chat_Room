@@ -1,6 +1,6 @@
 # [**Flipho_Chat_Room**](https://chatapp-e2bfc.web.app/)
 
-An Flipho_Chat_Room website, based on the **MERN** stack. 
+An Flipho_Chat_Room website, based on the **MERN** stack. In this app, i use firebase for google authentication and for hosting. Pusher is use for realtime chat.
 [Visit&nbsp;the&nbsp;live&nbsp;website](https://chatapp-e2bfc.web.app/)
 
 
@@ -38,7 +38,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 ### `nodemon index.js`
 
 Runs the back-end server app in the development mode.<br>
-Open [http://localhost:5000](http://localhost:8000) to view it in the browser. Please note that the server requires an active instance of the **MongoDB database**. Either provide a *MongoDB atlas* link in the `URI` environment variable, or use a local database, by placing its URI in the same.
+Open [http://localhost:5000](http://localhost:8000) to view it in the browser. Please note that the server requires an active instance of the **MongoDB database**. Either provide a *MongoDB atlas* link in the `URI` environment variable, or use a local database, by placing its DATABASE in the same.
 
 ---
 
