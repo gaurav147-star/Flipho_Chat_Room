@@ -12,7 +12,7 @@ import dotenv from "dotenv";
 // call the config function
 dotenv.config();
 
-//app config
+//app configdd
 const app = express();
 const port = process.env.PORT || 5000;
 

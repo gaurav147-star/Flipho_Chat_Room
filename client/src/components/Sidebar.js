@@ -61,7 +61,9 @@ const Sidebar = (messages) => {
             });
         }
         // e.preventDefault();
-        window.location.reload(true);
+        // e.preventDefault();
+
+        // window.location.reload(true);
     }
 
     return (
