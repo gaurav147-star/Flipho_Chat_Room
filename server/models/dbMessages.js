@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const whatsappSchema = mongoose.Schema({
   roomID: String,
@@ -10,4 +10,4 @@ const whatsappSchema = mongoose.Schema({
 });
 
 //collection
-export default mongoose.model("messages", whatsappSchema);
+module.exports = mongoose.model("messages", whatsappSchema);
