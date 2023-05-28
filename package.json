@@ -1,0 +1,26 @@
+{
+  "name": "flipho_chat_room",
+  "version": "1.0.0",
+  "description": "An Flipho_Chat_Room website, based on the **MERN** stack. In this app, i use firebase for google authentication and for hosting. Pusher is use for realtime chat. [Visit&nbsp;the&nbsp;live&nbsp;website](https://chatapp-e2bfc.web.app/)",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gaurav147-star/Flipho_Chat_Room.git"
+  },
+  "author": "Gaurav Gupta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gaurav147-star/Flipho_Chat_Room/issues"
+  },
+  "homepage": "https://github.com/gaurav147-star/Flipho_Chat_Room#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22"
+  }
+}
