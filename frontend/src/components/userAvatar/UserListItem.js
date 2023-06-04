@@ -20,7 +20,7 @@ const UserListItem = ({ user, handleFunction }) => {
       color="black"
       px={3}
       py={2}
-      mb={2}
+      // mb={2}
       borderRadius="lg"
     >
       <Avatar

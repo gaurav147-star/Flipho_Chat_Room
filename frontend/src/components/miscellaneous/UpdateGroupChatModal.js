@@ -1,4 +1,4 @@
-import { ViewIcon } from "@chakra-ui/icons";
+import { ViewIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Modal,
   ModalOverlay,
@@ -14,13 +14,16 @@ import {
   useToast,
   Box,
   IconButton,
+  Text,
   Spinner,
+  Stack,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
+import ExistGroupUserListItem from "../userAvatar/existGroupUserListItem";
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -112,8 +115,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       });
       return;
     }
-
-    if (selectedChat.groupAdmin._id !== user._id) {
+    if (!selectedChat.groupAdmin.some((admin) => admin._id === user._id)) {
       toast({
         title: "Only admins can add someone!",
         status: "error",
@@ -158,7 +160,32 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   };
 
   const handleRemove = async (user1) => {
-    if (selectedChat.groupAdmin._id !== user._id && user1._id !== user._id) {
+    if (selectedChat.groupOwner._id === user1._id) {
+      if (selectedChat.groupOwner._id === user._id) {
+        toast({
+          title: "You cannot remove youself until transfer group ownership!",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+        return;
+      } else {
+        toast({
+          title: "You cant remove Group Owner!",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+        return;
+      }
+    }
+
+    if (
+      !selectedChat.groupAdmin.some((admin) => admin._id === user._id) &&
+      !selectedChat.groupAdmin.some((admin) => admin._id === user1._id)
+    ) {
       toast({
         title: "Only admins can remove someone!",
         status: "error",
@@ -185,7 +212,9 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         config
       );
 
-      user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
+      // // user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
+      console.log(data);
+      setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       fetchMessages();
       setLoading(false);
@@ -203,6 +232,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     setGroupChatName("");
   };
 
+  console.log(selectedChat);
   return (
     <>
       <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
@@ -221,16 +251,13 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
           <ModalCloseButton />
           <ModalBody d="flex" flexDir="column" alignItems="center">
-            <Box w="100%" d="flex" flexWrap="wrap" pb={3}>
-              {selectedChat.users.map((u) => (
-                <UserBadgeItem
-                  key={u._id}
-                  user={u}
-                  admin={selectedChat.groupAdmin}
-                  handleFunction={() => handleRemove(u)}
-                />
-              ))}
-            </Box>
+            <Text fontStyle="italic" w="100%" pl={3} pb={2} color="#7e7e7e">
+              Created by{" "}
+              {selectedChat.groupOwner._id === user._id
+                ? "You"
+                : selectedChat.groupOwner.name}
+              , {selectedChat.createdAt.slice(0, 10)}
+            </Text>
             <FormControl d="flex">
               <Input
                 placeholder="Chat Name"
@@ -255,18 +282,50 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </FormControl>
-
+            {searchResult.length > 0 && (
+              <Box d="flex" w="100%" px={3} py={3}>
+                <CloseIcon boxSize={2} onClick={() => setSearchResult([])} />
+              </Box>
+            )}
             {loading ? (
               <Spinner size="lg" />
             ) : (
-              searchResult?.map((searchUser) => (
-                <UserListItem
-                  key={searchUser._id}
-                  user={searchUser}
-                  handleFunction={() => handleAddUser(searchUser)}
-                />
-              ))
+              <>
+                <Stack
+                  overflowY="scroll"
+                  w="100%"
+                  h={searchResult.length > 3 && "197px"}
+                >
+                  {searchResult?.map((searchUser) => (
+                    <UserListItem
+                      key={searchUser._id}
+                      user={searchUser}
+                      handleFunction={() => handleAddUser(searchUser)}
+                    />
+                  ))}
+                </Stack>
+              </>
             )}
+            <Text
+              w="100%"
+              textAlign="start"
+              pl={3}
+              color="#7e7e7e"
+              fontStyle="italic"
+              my={2}
+            >
+              {selectedChat && selectedChat.users.length} participant
+              {selectedChat.length !== 1 ? "s" : ""}
+            </Text>
+
+            {selectedChat.users.map((u) => (
+              <ExistGroupUserListItem
+                key={u._id}
+                useringroup={u}
+                admin={selectedChat.groupAdmin}
+                handleFunction={() => handleRemove(u)}
+              />
+            ))}
           </ModalBody>
           <ModalFooter>
             <Button onClick={() => handleRemove(user)} colorScheme="red">
