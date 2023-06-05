@@ -1,13 +1,21 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Text } from "@chakra-ui/layout";
 import { ChatState } from "../../Context/ChatProvider";
-import { SmallAddIcon } from "@chakra-ui/icons";
-import { Badge } from "@chakra-ui/react";
-const ExistGroupUserListItem = ({ admin, useringroup, handleFunction }) => {
-  const { user } = ChatState();
+import { useState } from "react";
+import { SmallAddIcon, SmallCloseIcon } from "@chakra-ui/icons";
+import { Badge, Button } from "@chakra-ui/react";
+const ExistGroupUserListItem = ({
+  admin,
+  useringroup,
+  handleRemoveFunction,
+  handleAddToGroupAdminFunction,
+  handleRemoveToGroupAdminFunction,
+}) => {
+  const { user, setSelectedChat } = ChatState();
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Box
-      //   onClick={handleFunction}
       cursor="pointer"
       bg="#E8E8E8"
       _hover={{
@@ -23,6 +31,7 @@ const ExistGroupUserListItem = ({ admin, useringroup, handleFunction }) => {
       mb={2}
       borderRadius="lg"
       justifyContent="space-between"
+      pos="relative"
     >
       <Box ml={2} d="flex" alignItems="center" w="100%">
         <Avatar
@@ -58,12 +67,73 @@ const ExistGroupUserListItem = ({ admin, useringroup, handleFunction }) => {
             </Badge>
           )}
         </Box>
+        {admin.some((admin) => admin._id === user._id) && (
+          <>
+            <Box onClick={() => setIsOpen(!isOpen)}>
+              {!isOpen ? <SmallAddIcon /> : <SmallCloseIcon />}
+            </Box>
+            {isOpen && (
+              <Box
+                pos="absolute"
+                right="7"
+                top="10"
+                bg="#fff"
+                color="#000"
+                d="flex"
+                flexDirection="column"
+                zIndex="100"
+                borderRadius="md"
+              >
+                <Box
+                  variant="link"
+                  py={1}
+                  px={2}
+                  // onClick={() => setSelectedChat(useringroup)}
+                >
+                  Message {useringroup.name}
+                </Box>
+                {!admin.some((admin) => admin._id === useringroup._id) ? (
+                  <Box
+                    variant="link"
+                    py={1}
+                    px={2}
+                    onClick={() => {
+                      handleAddToGroupAdminFunction();
+                      setIsOpen(!isOpen);
+                    }}
+                  >
+                    Make group admin
+                  </Box>
+                ) : (
+                  <Box
+                    variant="link"
+                    py={1}
+                    px={2}
+                    onClick={() => {
+                      handleRemoveToGroupAdminFunction();
+                      setIsOpen(!isOpen);
+                    }}
+                  >
+                    Dismiss as admin
+                  </Box>
+                )}
+
+                <Box
+                  py={1}
+                  px={2}
+                  variant="link"
+                  onClick={() => {
+                    handleRemoveFunction();
+                    setIsOpen(!isOpen);
+                  }}
+                >
+                  Remove {useringroup.name}
+                </Box>
+              </Box>
+            )}
+          </>
+        )}
       </Box>
-      {admin.some((admin) => admin._id === user._id) && (
-        <Box>
-          <SmallAddIcon />
-        </Box>
-      )}
     </Box>
   );
 };

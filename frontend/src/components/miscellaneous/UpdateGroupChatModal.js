@@ -1,12 +1,5 @@
-import { ViewIcon, CloseIcon } from "@chakra-ui/icons";
+import { ViewIcon, CloseIcon, SmallAddIcon, EditIcon } from "@chakra-ui/icons";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Button,
   useDisclosure,
   FormControl,
@@ -16,6 +9,14 @@ import {
   IconButton,
   Text,
   Spinner,
+  Image,
+  Drawer,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
   Stack,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -24,9 +25,12 @@ import { ChatState } from "../../Context/ChatProvider";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
 import ExistGroupUserListItem from "../userAvatar/existGroupUserListItem";
+import React from "react";
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = React.useRef();
+
   const [groupChatName, setGroupChatName] = useState();
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -35,6 +39,9 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const toast = useToast();
 
   const { selectedChat, setSelectedChat, user } = ChatState();
+
+  const [pic, setPic] = useState();
+  const [picLoading, setPicLoading] = useState(false);
 
   const handleSearch = async (query) => {
     setSearch(query);
@@ -232,25 +239,218 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     setGroupChatName("");
   };
 
-  console.log(selectedChat);
+  const AddToGroupAdmin = async (user1) => {
+    if (selectedChat.groupAdmin.some((admin) => admin._id === user1._id)) {
+      toast({
+        title: "User is already an admin!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+    if (!selectedChat.groupAdmin.some((admin) => admin._id === user._id)) {
+      toast({
+        title: "Only Group Owner can add Admin!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        `/api/chat/groupaddadmin`,
+        {
+          chatId: selectedChat._id,
+          userId: user1._id,
+        },
+        config
+      );
+
+      setSelectedChat(data);
+      setFetchAgain(!fetchAgain);
+      setLoading(false);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
+
+  const RemoveToGroupAdmin = async (user1) => {
+    if (selectedChat.groupOwner._id === user1._id) {
+      toast({
+        title: "You cannot remove Group Owner!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    if (
+      !selectedChat.groupAdmin.some((admin) => admin._id === user._id) &&
+      !selectedChat.groupAdmin.some((admin) => admin._id === user1._id)
+    ) {
+      toast({
+        title: "Only admins can remove someone!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        `/api/chat/groupremoveadmin`,
+        {
+          chatId: selectedChat._id,
+          userId: user1._id,
+        },
+        config
+      );
+
+      setSelectedChat(data);
+      setFetchAgain(!fetchAgain);
+      setLoading(false);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
+  const postDetails = (pics) => {
+    setPicLoading(true);
+    if (pics === undefined) {
+      toast({
+        title: "Please Select an Image!",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    if (pics.type === "image/jpeg" || pics.type === "image/png") {
+      const data = new FormData();
+      data.append("file", pics);
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", "djn1nfuky");
+      fetch("https://api.cloudinary.com/v1_1/djn1nfuky/image/upload", {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setPic(data.url.toString());
+          console.log(data.url.toString());
+          setPicLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setPicLoading(false);
+        });
+    } else {
+      toast({
+        title: "Please Select an Image!",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setPicLoading(false);
+      return;
+    }
+  };
+
   return (
     <>
       <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
 
-      <Modal onClose={onClose} isOpen={isOpen} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader
+      <Drawer
+        isOpen={isOpen}
+        placement="right"
+        onClose={onClose}
+        finalFocusRef={btnRef}
+        size="sm"
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <Box
+            d="flex"
+            justifyContent="center"
+            alignItems="center"
+            w="100%"
+            pt={10}
+          >
+            <Image
+              borderRadius="full"
+              boxSize="110px"
+              src={selectedChat.pic}
+              alt={selectedChat.chatname}
+            />
+          </Box>
+          <Box
+            d="flex"
+            justifyContent="center"
+            alignItems="center"
+            w="100%"
+            pl={20}
+            my={-3}
+          >
+            <label htmlFor="upload-input">
+              <EditIcon color="#bdbdbd" />
+            </label>
+            <Input
+              type="file"
+              display="none"
+              onChange={(e) => postDetails(e.target.files[0])}
+              id="upload-input"
+            />
+          </Box>
+          <DrawerHeader
             fontSize="35px"
             fontFamily="Work sans"
             d="flex"
             justifyContent="center"
           >
             {selectedChat.chatName}
-          </ModalHeader>
+          </DrawerHeader>
 
-          <ModalCloseButton />
-          <ModalBody d="flex" flexDir="column" alignItems="center">
+          <DrawerBody d="flex" flexDir="column" alignItems="center">
             <Text fontStyle="italic" w="100%" pl={3} pb={2} color="#7e7e7e">
               Created by{" "}
               {selectedChat.groupOwner._id === user._id
@@ -318,22 +518,35 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
               {selectedChat.length !== 1 ? "s" : ""}
             </Text>
 
-            {selectedChat.users.map((u) => (
-              <ExistGroupUserListItem
-                key={u._id}
-                useringroup={u}
-                admin={selectedChat.groupAdmin}
-                handleFunction={() => handleRemove(u)}
-              />
-            ))}
-          </ModalBody>
-          <ModalFooter>
+            {selectedChat.users
+              .filter(
+                (u) =>
+                  !selectedChat.groupAdmin.some((admin) => admin._id === u._id)
+              )
+              .concat(
+                selectedChat.users.filter((u) =>
+                  selectedChat.groupAdmin.some((admin) => admin._id === u._id)
+                )
+              )
+              .reverse()
+              .map((u) => (
+                <ExistGroupUserListItem
+                  key={u._id}
+                  useringroup={u}
+                  admin={selectedChat.groupAdmin}
+                  handleRemoveFunction={() => handleRemove(u)}
+                  handleAddToGroupAdminFunction={() => AddToGroupAdmin(u)}
+                  handleRemoveToGroupAdminFunction={() => RemoveToGroupAdmin(u)}
+                />
+              ))}
+          </DrawerBody>
+          <DrawerFooter>
             <Button onClick={() => handleRemove(user)} colorScheme="red">
               Leave Group
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };

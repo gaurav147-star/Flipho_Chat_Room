@@ -128,9 +128,9 @@ const addToGroupAdmin = asyncHandler(async (req, res) => {
       throw new Error("Chat not found");
     }
 
-    if (chat.groupOwner.toString() !== req.user._id.toString()) {
+    if (!chat.groupAdmin.includes(req.user._id.toString())) {
       res.status(403);
-      throw new Error("Only the group owner can assign group admins");
+      throw new Error("Only group admins can perform this action");
     }
 
     // Add the user to the group admins if not already present
@@ -168,18 +168,16 @@ const removeToGroupAdmin = asyncHandler(async (req, res) => {
       throw new Error("You cannot remove yourself as a group admin");
     }
     // Remove the user from the group admins if the user is a group admin and is not the group owner
-    const index = chat.groupAdmin.indexOf(userId);
+    const index = chat.groupAdmin.findIndex(
+      (adminId) => adminId.toString() === userId.toString()
+    );
     if (
       index !== -1 &&
       chat.groupAdmin[index].toString() !== chat.groupOwner.toString()
     ) {
       chat.groupAdmin.splice(index, 1);
       await chat.save();
-    } else {
-      res.status(400);
-      throw new Error("Invalid operation");
     }
-
     // Populate the necessary fields before sending the response
     const updatedChat = await Chat.findOne({ _id: chat._id })
       .populate("users", "-password")
@@ -197,7 +195,7 @@ const removeToGroupAdmin = asyncHandler(async (req, res) => {
 // @route   PUT /api/chat/rename
 // @access  Protected
 const renameGroup = asyncHandler(async (req, res) => {
-  const { chatId, chatName } = req.body;
+  const { chatId, chatName, pic } = req.body;
 
   const updatedChat = await Chat.findByIdAndUpdate(
     chatId,

@@ -157,7 +157,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     }, timerLength);
   };
-
+  
   return (
     <>
       {selectedChat ? (

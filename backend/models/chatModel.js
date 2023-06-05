@@ -11,6 +11,12 @@ const chatModel = mongoose.Schema(
     },
     groupOwner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     groupAdmin: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    pic: {
+      type: "String",
+      required: true,
+      default:
+        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+    },
   },
   { timestamps: true }
 );
