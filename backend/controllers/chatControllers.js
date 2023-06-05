@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const CryptoJS = require("crypto-js");
 
 //@description     Create or fetch One to One Chat
 //@route           POST /api/chat/
@@ -72,7 +73,16 @@ const fetchChats = asyncHandler(async (req, res) => {
     if (!results) {
       return res.status(404).json({ message: "Chats not found" });
     }
-
+    const decryptedResults = results.map((result) => {
+      if (result.latestMessage) {
+        const decryptedContent = CryptoJS.AES.decrypt(
+          result.latestMessage.content,
+          process.env.SECRET_KEY
+        ).toString(CryptoJS.enc.Utf8);
+        result.latestMessage.content = decryptedContent;
+      }
+      return result;
+    });
     res.status(200).json(results);
   } catch (error) {
     res.status(400).json({ message: error.message });
