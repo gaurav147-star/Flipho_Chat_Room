@@ -70,9 +70,9 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
+      setUser(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
       setPicLoading(false);
-      setUser(data);
       history.push("/chats");
     } catch (error) {
       toast({
