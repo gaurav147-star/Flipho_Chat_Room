@@ -83,7 +83,7 @@ const fetchChats = asyncHandler(async (req, res) => {
       }
       return result;
     });
-    res.status(200).json(results);
+    res.status(200).json(decryptedResults);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
