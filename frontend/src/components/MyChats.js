@@ -3,10 +3,10 @@ import { Box, Stack, Text } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { getSender } from "../config/ChatLogics";
+import { getSender, getSenderPic } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
-import { Button } from "@chakra-ui/react";
+import { Button, Avatar } from "@chakra-ui/react";
 import { ChatState } from "../Context/ChatProvider";
 
 const MyChats = ({ fetchAgain }) => {
@@ -46,6 +46,10 @@ const MyChats = ({ fetchAgain }) => {
     // eslint-disable-next-line
   }, [fetchAgain]);
 
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   return (
     <Box
       d={{ base: selectedChat ? "none" : "flex", md: "flex" }}
@@ -53,7 +57,7 @@ const MyChats = ({ fetchAgain }) => {
       alignItems="center"
       p={3}
       bg="white"
-      w={{ base: "100%", md: "31%" }}
+      w={{ base: "100%", md: "28%" }}
       borderRadius="lg"
       borderWidth="1px"
     >
@@ -100,20 +104,26 @@ const MyChats = ({ fetchAgain }) => {
                 py={2}
                 borderRadius="lg"
                 key={chat._id}
+                d="flex"
               >
-                <Text>
-                  {!chat.isGroupChat
-                    ? getSender(loggedUser, chat.users)
-                    : chat.chatName}
-                </Text>
-                {chat.latestMessage && (
-                  <Text fontSize="xs">
-                    <b>{chat.latestMessage.name} : </b>
-                    {chat.latestMessage.content.length > 50
-                      ? chat.latestMessage.content.substring(0, 51) + "..."
-                      : chat.latestMessage.content}
+                <Box d="flex" alignItems="center">
+                  <Avatar src={getSenderPic(loggedUser, chat.users)} />
+                </Box>
+                <Box ml={3}>
+                  <Text fontSize="xl">
+                    {!chat.isGroupChat
+                      ? getSender(loggedUser, chat.users) &&
+                        capitalizeFirstLetter(getSender(loggedUser, chat.users))
+                      : chat.chatName && capitalizeFirstLetter(chat.chatName)}
                   </Text>
-                )}
+                  {chat.latestMessage && (
+                    <Text fontSize="xs" color="#3a3a3a">
+                      {chat.latestMessage.content.length > 50
+                        ? chat.latestMessage.content.substring(0, 51) + "..."
+                        : chat.latestMessage.content}
+                    </Text>
+                  )}
+                </Box>
               </Box>
             ))}
           </Stack>

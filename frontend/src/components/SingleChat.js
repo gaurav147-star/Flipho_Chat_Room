@@ -2,8 +2,8 @@ import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./styles.css";
-import { IconButton, Spinner, useToast } from "@chakra-ui/react";
-import { getSender, getSenderFull } from "../config/ChatLogics";
+import { IconButton, Spinner, useToast, Avatar } from "@chakra-ui/react";
+import { getSender, getSenderPic, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -159,36 +159,50 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }, timerLength);
   };
 
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   return (
     <>
       {selectedChat ? (
         <>
-          <Text
+          <Box
             fontSize={{ base: "28px", md: "30px" }}
             pb={3}
             px={2}
             w="100%"
             fontFamily="Work sans"
             d="flex"
+            flexDirection="row"
             justifyContent={{ base: "space-between" }}
             alignItems="center"
           >
-            <IconButton
-              d={{ base: "flex", md: "none" }}
-              icon={<ArrowBackIcon />}
-              onClick={() => setSelectedChat("")}
-            />
             {messages &&
               (!selectedChat.isGroupChat ? (
                 <>
-                  {getSender(user, selectedChat.users)}
+                  <Box d="flex">
+                    <Avatar src={getSenderPic(user, selectedChat.users)} />
+                    <Text pl={2} as="b" fontSize="2xl">
+                      {getSender(user, selectedChat.users) &&
+                        capitalizeFirstLetter(
+                          getSender(user, selectedChat.users)
+                        )}
+                    </Text>
+                  </Box>
                   <ProfileModal
                     user={getSenderFull(user, selectedChat.users)}
                   />
                 </>
               ) : (
                 <>
-                  {selectedChat.chatName.toUpperCase()}
+                  <Box d="flex">
+                    <Avatar src={getSenderPic(user, selectedChat.users)} />
+                    <Text pl={2} fontSize="2xl" as="b">
+                      {selectedChat.chatName &&
+                        capitalizeFirstLetter(selectedChat.chatName)}
+                    </Text>
+                  </Box>
                   <UpdateGroupChatModal
                     fetchMessages={fetchMessages}
                     fetchAgain={fetchAgain}
@@ -196,7 +210,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                   />
                 </>
               ))}
-          </Text>
+          </Box>
           <Box
             d="flex"
             flexDir="column"
