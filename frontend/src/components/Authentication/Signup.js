@@ -7,9 +7,11 @@ import axios from "axios";
 import { useState } from "react";
 import { useHistory } from "react-router";
 import { ChatState } from "../../Context/ChatProvider";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 const Signup = () => {
   const [show, setShow] = useState(false);
+  const [cshow, setCshow] = useState(false);
   const handleClick = () => setShow(!show);
   const toast = useToast();
   const history = useHistory();
@@ -158,8 +160,8 @@ const Signup = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? "Hide" : "Show"}
+            <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+              {show ? <ViewOffIcon /> : <ViewIcon />}
             </Button>
           </InputRightElement>
         </InputGroup>
@@ -168,13 +170,13 @@ const Signup = () => {
         <FormLabel>Confirm Password</FormLabel>
         <InputGroup size="md">
           <Input
-            type={show ? "text" : "password"}
+            type={cshow ? "text" : "password"}
             placeholder="Confirm password"
             onChange={(e) => setConfirmpassword(e.target.value)}
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? "Hide" : "Show"}
+            <Button h="1.75rem" size="sm" onClick={() => setCshow(!cshow)}>
+              {cshow ? <ViewOffIcon /> : <ViewIcon />}
             </Button>
           </InputRightElement>
         </InputGroup>
@@ -189,8 +191,10 @@ const Signup = () => {
         />
       </FormControl>
       <Button
-        colorScheme="blue"
-        width="100%"
+        bg="#000"
+        width="30%"
+        _hover={{ bg: "#fff", color: "#000", border: "1px solid #000" }}
+        color="#fff"
         style={{ marginTop: 15 }}
         onClick={submitHandler}
         isLoading={picLoading}
