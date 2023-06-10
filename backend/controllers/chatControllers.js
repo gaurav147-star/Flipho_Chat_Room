@@ -206,20 +206,35 @@ const removeToGroupAdmin = asyncHandler(async (req, res) => {
 // @access  Protected
 const renameGroup = asyncHandler(async (req, res) => {
   const { chatId, chatName, pic } = req.body;
+  let updatedChat;
+  if (!pic) {
+    updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
 
-  const updatedChat = await Chat.findByIdAndUpdate(
-    chatId,
-    {
-      chatName: chatName,
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("users", "-password")
-    .populate("groupOwner", "-password")
-    .populate("groupAdmin", "-password");
-
+      {
+        chatName: chatName,
+      },
+      {
+        new: true,
+      }
+    )
+      .populate("users", "-password")
+      .populate("groupOwner", "-password")
+      .populate("groupAdmin", "-password");
+  } else if (!chatName) {
+    updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        pic: pic,
+      },
+      {
+        new: true,
+      }
+    )
+      .populate("users", "-password")
+      .populate("groupOwner", "-password")
+      .populate("groupAdmin", "-password");
+  }
   if (!updatedChat) {
     res.status(404);
     throw new Error("Chat Not Found");

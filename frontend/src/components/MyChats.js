@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getSender, getSenderPic } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
-import { Button, Avatar } from "@chakra-ui/react";
+import { Button, Avatar, AvatarGroup } from "@chakra-ui/react";
 import { ChatState } from "../Context/ChatProvider";
 
 const MyChats = ({ fetchAgain }) => {
@@ -107,7 +107,26 @@ const MyChats = ({ fetchAgain }) => {
                 d="flex"
               >
                 <Box d="flex" alignItems="center">
-                  <Avatar src={getSenderPic(loggedUser, chat.users)} />
+                  {!chat.isGroupChat ? (
+                    <>
+                      {getSenderPic(loggedUser, chat.users) ? (
+                        <Avatar src={getSenderPic(loggedUser, chat.users)} />
+                      ) : (
+                        <Avatar src="https://bit.ly/broken-link" />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {chat.pic ? (
+                        <AvatarGroup size="md" max={2}>
+                          <Avatar src={chat.pic} />
+                          <Avatar src="https://bit.ly/broken-link" mx={-7} />
+                        </AvatarGroup>
+                      ) : (
+                        <Avatar src="https://bit.ly/broken-link" />
+                      )}
+                    </>
+                  )}
                 </Box>
                 <Box ml={3}>
                   <Text fontSize="xl">

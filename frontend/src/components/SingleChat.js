@@ -15,8 +15,8 @@ import animationData from "../animations/typing.json";
 import io from "socket.io-client";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
-const ENDPOINT = "https://fliphochat.onrender.com/";
-// const ENDPOINT = "http://localhost:5000";
+// const ENDPOINT = "https://fliphochat.onrender.com/";
+const ENDPOINT = "http://localhost:5000";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -183,6 +183,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 <>
                   <Box d="flex">
                     <Avatar src={getSenderPic(user, selectedChat.users)} />
+
                     <Text pl={2} as="b" fontSize="2xl">
                       {getSender(user, selectedChat.users) &&
                         capitalizeFirstLetter(
@@ -197,7 +198,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               ) : (
                 <>
                   <Box d="flex">
-                    <Avatar src={getSenderPic(user, selectedChat.users)} />
+                    <Avatar src={selectedChat.pic} />
                     <Text pl={2} fontSize="2xl" as="b">
                       {selectedChat.chatName &&
                         capitalizeFirstLetter(selectedChat.chatName)}

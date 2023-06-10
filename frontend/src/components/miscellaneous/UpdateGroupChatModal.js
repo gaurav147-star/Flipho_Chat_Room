@@ -17,18 +17,29 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
   Stack,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
-import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
 import ExistGroupUserListItem from "../userAvatar/existGroupUserListItem";
 import React from "react";
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenImage,
+    onOpen: onOpenImage,
+    onClose: onCloseImage,
+  } = useDisclosure();
   const btnRef = React.useRef();
 
   const [groupChatName, setGroupChatName] = useState();
@@ -39,9 +50,6 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const toast = useToast();
 
   const { selectedChat, setSelectedChat, user } = ChatState();
-
-  const [pic, setPic] = useState();
-  const [picLoading, setPicLoading] = useState(false);
 
   const handleSearch = async (query) => {
     setSearch(query);
@@ -346,7 +354,12 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       setLoading(false);
     }
   };
-  const postDetails = (pics) => {
+
+  const [pic, setPic] = useState();
+  const [picLoading, setPicLoading] = useState(false);
+
+  const handleImageUpload = (event) => {
+    const pics = event.target.files[0];
     setPicLoading(true);
     if (pics === undefined) {
       toast({
@@ -375,6 +388,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
           setPicLoading(false);
         })
         .catch((err) => {
+          console.log(err);
           setPicLoading(false);
         });
     } else {
@@ -387,6 +401,41 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       });
       setPicLoading(false);
       return;
+    }
+  };
+
+  const handleGroupImageUpload = async () => {
+    if (!pic) return;
+
+    try {
+      setPicLoading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        `/api/chat/rename`,
+        {
+          chatId: selectedChat._id,
+          pic: pic,
+        },
+        config
+      );
+
+      setSelectedChat(data);
+      setFetchAgain(!fetchAgain);
+      setPicLoading(false);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setPicLoading(false);
     }
   };
 
@@ -423,19 +472,52 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
             justifyContent="center"
             alignItems="center"
             w="100%"
-            pl={20}
-            my={-3}
+            pl={100}
+            my={-4}
+            // onClick={onOpenImage}
           >
-            <label htmlFor="upload-input">
-              <EditIcon color="#bdbdbd" />
-            </label>
-            <Input
-              type="file"
-              display="none"
-              onChange={(e) => postDetails(e.target.files[0])}
-              id="upload-input"
+            <IconButton
+              aria-label="Search database"
+              icon={<EditIcon />}
+              onClick={onOpenImage}
+              size="xs"
             />
           </Box>
+          <Modal isOpen={isOpenImage} onClose={onCloseImage}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Upload Image</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <input type="file" onChange={handleImageUpload} />
+                <Box
+                  my={4}
+                  w="100%"
+                  d="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  {pic && <img src={pic} alt="Selected" />}
+                </Box>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button colorScheme="blue" mr={3} onClick={onCloseImage}>
+                  Close
+                </Button>
+                <Button
+                  variant="ghost"
+                  isLoading={picLoading}
+                  onClick={() => {
+                    handleGroupImageUpload();
+                    onCloseImage();
+                  }}
+                >
+                  Update
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
           <DrawerHeader
             fontSize="35px"
             fontFamily="Work sans"
