@@ -448,7 +448,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         placement="right"
         onClose={onClose}
         finalFocusRef={btnRef}
-        size="sm"
+        size="md"
       >
         <DrawerOverlay />
         <DrawerContent>

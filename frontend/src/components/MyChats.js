@@ -44,7 +44,7 @@ const MyChats = ({ fetchAgain }) => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
     // eslint-disable-next-line
-  }, [fetchAgain]);
+  }, [fetchAgain, user]);
 
   const capitalizeFirstLetter = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -63,7 +63,7 @@ const MyChats = ({ fetchAgain }) => {
     >
       <Box
         pb={3}
-        px={3}
+        px={{ base: "1", md: "3" }}
         fontSize={{ base: "28px", md: "30px" }}
         fontFamily="Work sans"
         d="flex"
@@ -71,16 +71,19 @@ const MyChats = ({ fetchAgain }) => {
         justifyContent="space-between"
         alignItems="center"
       >
-        My Chats
-        <GroupChatModal>
-          <Button
-            d="flex"
-            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-            rightIcon={<AddIcon />}
-          >
-            New Group Chat
-          </Button>
-        </GroupChatModal>
+        <Box fontSize={{ base: "22px", md: "10px", lg: "17px" }}>My Chats</Box>
+        <Box>
+          <GroupChatModal>
+            <Button
+              d="flex"
+              fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+              rightIcon={<AddIcon />}
+              w={{ base: "100%", md: "100%", lg: "100%" }}
+            >
+              New Group Chat
+            </Button>
+          </GroupChatModal>
+        </Box>
       </Box>
       <Box
         d="flex"

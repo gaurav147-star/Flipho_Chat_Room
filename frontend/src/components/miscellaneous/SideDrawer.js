@@ -25,14 +25,14 @@ import axios from "axios";
 import { useToast } from "@chakra-ui/toast";
 import ChatLoading from "../ChatLoading";
 import { Spinner } from "@chakra-ui/spinner";
-import ProfileModal from "./ProfileModal";
+import MineprofileModal from "./MineprofileModal";
 import NotificationBadge from "react-notification-badge";
 import { Effect } from "react-notification-badge";
 import { getSender } from "../../config/ChatLogics";
 import UserListItem from "../userAvatar/UserListItem";
 import { ChatState } from "../../Context/ChatProvider";
 
-function SideDrawer() {
+function SideDrawer({ fetchAgain, setFetchAgain }) {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -94,7 +94,6 @@ function SideDrawer() {
   };
 
   const accessChat = async (userId) => {
-
     try {
       setLoadingChat(true);
       const config = {
@@ -140,12 +139,12 @@ function SideDrawer() {
             </Text>
           </Button>
         </Tooltip>
-        <Text fontSize="2xl" fontFamily="Work sans">
-          Flipho-Chat-Room
+        <Text fontSize="2xl" fontFamily="Work sans" pr={{ base: "2" }}>
+          FliphoChatRoom
         </Text>
-        <div>
+        <Box d={{ base: "flex" }}>
           <Menu>
-            <MenuButton p={1}>
+            <MenuButton p={{ md: "1" }}>
               <NotificationBadge
                 count={notification.length}
                 effect={Effect.SCALE}
@@ -170,7 +169,12 @@ function SideDrawer() {
             </MenuList>
           </Menu>
           <Menu>
-            <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
+            <MenuButton
+              px={{ base: "1" }}
+              as={Button}
+              bg="white"
+              rightIcon={<ChevronDownIcon />}
+            >
               <Avatar
                 size="sm"
                 cursor="pointer"
@@ -179,14 +183,18 @@ function SideDrawer() {
               />
             </MenuButton>
             <MenuList>
-              <ProfileModal user={user}>
+              <MineprofileModal
+                user={user}
+                fetchAgain={fetchAgain}
+                setFetchAgain={setFetchAgain}
+              >
                 <MenuItem>My Profile</MenuItem>{" "}
-              </ProfileModal>
+              </MineprofileModal>
               <MenuDivider />
               <MenuItem onClick={logoutHandler}>Logout</MenuItem>
             </MenuList>
           </Menu>
-        </div>
+        </Box>
       </Box>
 
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>

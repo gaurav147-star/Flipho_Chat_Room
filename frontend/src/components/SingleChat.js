@@ -26,6 +26,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
+  const [online, setOnline] = useState(false);
   const toast = useToast();
 
   const defaultOptions = {
@@ -137,7 +138,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     });
   });
+  useEffect(() => {
+    if (!selectedChat || selectedChat.isGroupChat) return;
 
+    const isUserOnline = selectedChat.users.some(
+      (userId) => userId === user._id
+    );
+
+    setOnline(isUserOnline && socketConnected);
+  }, [selectedChat, socketConnected, user._id]);
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
 
@@ -178,6 +187,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             justifyContent={{ base: "space-between" }}
             alignItems="center"
           >
+            <IconButton
+              d={{ md: "flex" }}
+              icon={<ArrowBackIcon />}
+              onClick={() => setSelectedChat("")}
+            />
             {messages &&
               (!selectedChat.isGroupChat ? (
                 <>
@@ -190,6 +204,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                           getSender(user, selectedChat.users)
                         )}
                     </Text>
+                    {online && <Text>Online</Text>}
                   </Box>
                   <ProfileModal
                     user={getSenderFull(user, selectedChat.users)}

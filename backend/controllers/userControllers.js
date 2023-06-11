@@ -66,7 +66,6 @@ const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
@@ -82,4 +81,29 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { allUsers, registerUser, authUser };
+const updatePic = asyncHandler(async (req, res) => {
+  const { userId, pic } = req.body;
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      pic: pic,
+    },
+    {
+      new: true,
+    }
+  );
+  console.log(updatedUser);
+  if (!updatedUser) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  if (updatedUser) {
+    res.status(200).json(updatedUser);
+  } else {
+    res.status(400);
+    throw new Error("Failed to update user's profile picture");
+  }
+});
+
+module.exports = { allUsers, registerUser, authUser, updatePic };

@@ -59,11 +59,14 @@ const io = require("socket.io")(server, {
   },
 });
 
+const onlineUsers = {}; // Maintain a dictionary of online users
+
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
   socket.on("setup", (userData) => {
     socket.join(userData._id);
     socket.emit("connected");
+    onlineUsers[userData._id] = true; // Add user to online users dictionary
   });
 
   socket.on("join chat", (room) => {
@@ -85,7 +88,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.off("setup", () => {
+  socket.off("disconnect", () => {
     console.log("USER DISCONNECTED");
     socket.leave(userData._id);
   });
