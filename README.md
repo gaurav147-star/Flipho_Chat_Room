@@ -49,10 +49,12 @@ Open [http://localhost:5000](http://localhost:8000) to view it in the browser. P
 ---
 
 ## Application Screenshots
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/0fcbda9f-6fd5-4f1d-8ad1-0988fb2cfb30)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/cbaabd14-7656-4f39-b1a3-c4b19f54ac3a)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/73ef7dd9-e9b5-42df-8a24-aafcc0571743)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/9db97acb-3eb9-46d5-ba5c-99b5e58f0474)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/c4ff666d-525d-4fdd-a4f6-4cce037f2f48)
 
-<a href="https://chatapp-e2bfc.web.app/" target="_blank">
-	<img src="./assets/flipho1.png" alt="Flipho_Chat_Room Screenshot" />
-	<img src="./assets/flipho2.png" alt="Flipho_Chat_Room Screenshot" />
-	<img src="./assets/flipho3.png" alt="Flipho_Chat_Room Screenshot" />
-	
-</a>
+
+
+
