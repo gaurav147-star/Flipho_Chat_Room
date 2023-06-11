@@ -4,7 +4,7 @@
 
 ● Implemented secure communication with CryptoJS for AES encryption and JWT authentication. Ensured privacy, user authenticity, and information protection in the chat application.
 
-● Maintained a friendly environment while integrating these security measures. Managed a large user base of 20+ individuals, facilitating group chats and one-to-one conversations, while utilizing Socket.io for real-time communication.
+● Maintained a friendly environment while integrating these security measures. Facilitating group chats and one-to-one conversations, while utilizing Socket.io for real-time communication.
 
 [Visit&nbsp;the&nbsp;live&nbsp;website](https://fliphochat.onrender.com/)
 
