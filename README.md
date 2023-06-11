@@ -1,6 +1,10 @@
 # [**Flipho_Chat_Room**](https://fliphochat.onrender.com/)
 
-An Flipho_Chat_Room website, based on the **MERN** stack. In this app, i use firebase for google authentication and for hosting. Pusher is use for realtime chat.
+● Developed a real-time chat application using ReactJS, MongoDB, ExpressJS, NodeJS, ChakraUI, Socket.io, and CryptoJS.
+● Implemented secure communication with CryptoJS for AES encryption and JWT authentication. Ensured privacy, user
+authenticity, and information protection in the chat application.
+● Maintained a friendly environment while integrating these security measures. Managed a large user base of 20+ individuals,
+facilitating group chats and one-to-one conversations, while utilizing Socket.io for real-time communication.
 [Visit&nbsp;the&nbsp;live&nbsp;website](https://fliphochat.onrender.com/)
 
 ---
