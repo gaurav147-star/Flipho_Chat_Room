@@ -51,9 +51,9 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
   const { selectedChat, setSelectedChat, user } = ChatState();
 
-  const handleSearch = async (query) => {
-    setSearch(query);
-    if (!query) {
+  const handleSearch = async (search) => {
+    console.log(search);
+    if (!search) {
       return;
     }
 
@@ -154,7 +154,8 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         },
         config
       );
-
+      setSearch("");
+      setSearchResult([]);
       setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       setLoading(false);
@@ -535,6 +536,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                 : selectedChat.groupOwner.name}
               , {selectedChat.createdAt.slice(0, 10)}
             </Text>
+
             <FormControl d="flex">
               <Input
                 placeholder="Chat Name"
@@ -556,31 +558,35 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
               <Input
                 placeholder="Add User to group"
                 mb={1}
-                onChange={(e) => handleSearch(e.target.value)}
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  handleSearch(search);
+                }}
               />
             </FormControl>
-            {searchResult.length > 0 && (
+            {search.length > 0 && (
               <Box d="flex" w="100%" px={3} py={3}>
-                <CloseIcon boxSize={2} onClick={() => setSearchResult([])} />
+                <CloseIcon
+                  boxSize={2}
+                  onClick={() => {
+                    setSearch("");
+                    setSearchResult([]);
+                  }}
+                />
               </Box>
             )}
             {loading ? (
               <Spinner size="lg" />
             ) : (
               <>
-                <Stack
-                  overflowY="scroll"
-                  w="100%"
-                  h={searchResult.length > 3 && "197px"}
-                >
-                  {searchResult?.map((searchUser) => (
-                    <UserListItem
-                      key={searchUser._id}
-                      user={searchUser}
-                      handleFunction={() => handleAddUser(searchUser)}
-                    />
-                  ))}
-                </Stack>
+                {searchResult?.map((searchUser) => (
+                  <UserListItem
+                    key={searchUser._id}
+                    user={searchUser}
+                    handleFunction={() => handleAddUser(searchUser)}
+                  />
+                ))}
               </>
             )}
             <Text

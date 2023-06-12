@@ -2,8 +2,19 @@ import { Avatar } from "@chakra-ui/avatar";
 import { Box, Text } from "@chakra-ui/layout";
 import { ChatState } from "../../Context/ChatProvider";
 import { useState } from "react";
-import { SmallAddIcon, SmallCloseIcon } from "@chakra-ui/icons";
-import { Badge, Button } from "@chakra-ui/react";
+import {
+  SmallAddIcon,
+  SmallCloseIcon,
+  ChevronDownIcon,
+} from "@chakra-ui/icons";
+import {
+  Badge,
+  Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from "@chakra-ui/react";
 const ExistGroupUserListItem = ({
   admin,
   useringroup,
@@ -36,7 +47,7 @@ const ExistGroupUserListItem = ({
       <Box ml={2} d="flex" alignItems="center" w="100%">
         <Avatar
           mr={2}
-          size="sm"
+          size="md"
           cursor="pointer"
           name={useringroup.name}
           src={useringroup.pic}
@@ -49,10 +60,6 @@ const ExistGroupUserListItem = ({
         >
           <Box>
             <Text>{useringroup.name}</Text>
-            <Text fontSize="xs">
-              <b>Email : </b>
-              {useringroup.email}
-            </Text>
           </Box>
           {admin.some((admin) => admin._id === useringroup._id) && (
             <Badge
@@ -83,11 +90,14 @@ const ExistGroupUserListItem = ({
                 flexDirection="column"
                 zIndex="100"
                 borderRadius="md"
+                gap={3}
+                py={3}
+                px={5}
+                fontSize={16}
               >
                 <Box
                   variant="link"
-                  py={1}
-                  px={2}
+
                   // onClick={() => setSelectedChat(useringroup)}
                 >
                   Message {useringroup.name}
@@ -95,8 +105,6 @@ const ExistGroupUserListItem = ({
                 {!admin.some((admin) => admin._id === useringroup._id) ? (
                   <Box
                     variant="link"
-                    py={1}
-                    px={2}
                     onClick={() => {
                       handleAddToGroupAdminFunction();
                       setIsOpen(!isOpen);
@@ -107,8 +115,6 @@ const ExistGroupUserListItem = ({
                 ) : (
                   <Box
                     variant="link"
-                    py={1}
-                    px={2}
                     onClick={() => {
                       handleRemoveToGroupAdminFunction();
                       setIsOpen(!isOpen);
@@ -119,8 +125,6 @@ const ExistGroupUserListItem = ({
                 )}
 
                 <Box
-                  py={1}
-                  px={2}
                   variant="link"
                   onClick={() => {
                     handleRemoveFunction();
