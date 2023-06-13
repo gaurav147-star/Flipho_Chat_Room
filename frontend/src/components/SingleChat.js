@@ -3,7 +3,12 @@ import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./styles.css";
 import { IconButton, Spinner, useToast, Avatar } from "@chakra-ui/react";
-import { getSender, getSenderPic, getSenderFull } from "../config/ChatLogics";
+import {
+  getSender,
+  getSenderPic,
+  getSenderFull,
+  getSenderId,
+} from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -105,6 +110,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     }
   };
+  const [onlineUsers, setOnlineUsers] = useState({});
 
   useEffect(() => {
     socket = io(ENDPOINT);
@@ -112,7 +118,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
+    socket.on("onlineUsers", (users) => {
+      setOnlineUsers(users);
+    });
+    socket.on("disconnect", () => {
+      setSocketConnected(false);
+    });
 
+    return () => {
+      socket.disconnect(); // Disconnect the socket when the component unmounts
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -196,15 +211,21 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               (!selectedChat.isGroupChat ? (
                 <>
                   <Box d="flex">
-                    <Avatar src={getSenderPic(user, selectedChat.users)} />
-
-                    <Text pl={2} as="b" fontSize="2xl">
-                      {getSender(user, selectedChat.users) &&
-                        capitalizeFirstLetter(
-                          getSender(user, selectedChat.users)
-                        )}
-                    </Text>
-                    {online && <Text>Online</Text>}
+                    <Box>
+                      <Avatar src={getSenderPic(user, selectedChat.users)} />
+                    </Box>
+                    <Box d="flex" flexDirection="column" pl={2}>
+                      <Text as="b" fontSize="22px">
+                        {getSender(user, selectedChat.users) &&
+                          capitalizeFirstLetter(
+                            getSender(user, selectedChat.users)
+                          ).substring(0, 15)}
+                      </Text>
+                      <Text mt="-1.5" fontSize="14px">
+                        {getSenderId(user, selectedChat.users) in onlineUsers &&
+                          "Online"}
+                      </Text>
+                    </Box>
                   </Box>
                   <ProfileModal
                     user={getSenderFull(user, selectedChat.users)}

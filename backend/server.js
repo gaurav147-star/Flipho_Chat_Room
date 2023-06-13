@@ -66,7 +66,8 @@ io.on("connection", (socket) => {
   socket.on("setup", (userData) => {
     socket.join(userData._id);
     socket.emit("connected");
-    onlineUsers[userData._id] = true; // Add user to online users dictionary
+    onlineUsers[userData._id] = socket.id; // Add user to online users dictionary
+    io.emit("onlineUsers", onlineUsers); // Send updated onlineUsers data to all connected sockets
   });
 
   socket.on("join chat", (room) => {
@@ -88,8 +89,14 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.off("disconnect", () => {
+  socket.on("disconnect", () => {
     console.log("USER DISCONNECTED");
-    socket.leave(userData._id);
+    for (let userId in onlineUsers) {
+      if (onlineUsers[userId] === socket.id) {
+        delete onlineUsers[userId];
+        break;
+      }
+    }
+    io.emit("onlineUsers", onlineUsers); // Send updated onlineUsers data to all connected sockets
   });
 });
