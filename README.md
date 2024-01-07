@@ -58,4 +58,21 @@ Open [http://localhost:5000](http://localhost:8000) to view it in the browser. P
 
 
 
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/b30a1f2a-c16e-48d5-bab9-a97141518cef)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/5ee52341-796a-4662-a081-84d632e6d69f)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/3cda0322-f12d-43e2-a750-3085363461a7)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/c59e666f-8343-4536-a879-c2fc429d16b7)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/252f5c40-a469-4494-b7c3-c7f410b9352f)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/07e7c62d-a9bc-4812-81de-e96dcd1bbf91)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/329884e3-27e8-42c7-9d7d-237df9cce107)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/52e605cb-cfe4-41bb-aa2a-d9eb92eebeab)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/4c58dc41-a5b9-41cd-b6b7-d379041a4e94)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/3016ed45-f5a9-4915-afd2-c78b68cea37e)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/9baf6429-952f-4ca8-9313-72c63fe18ae6)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/59d43109-7fb8-414f-90bd-e58a336f9997)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/f586ad40-40f0-4f2a-9573-2c341ce0a0a5)
+![image](https://github.com/gaurav147-star/Flipho_Chat_Room/assets/78996081/1346cccb-651e-4ea2-a984-6c558ea1b834)
+
+
+
 
