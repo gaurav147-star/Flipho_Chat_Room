@@ -151,7 +151,7 @@ Have NodeJS and MongoDB installed on your machine.
    git clone https://github.com/gaurav147-star/Flipho_Chat_Room.git
    ```
 2. ```sh
-   cd ./booking-app
+   cd ./Flipho_Chat_Room
    ```
 3. Install node dependencies in all folders.
    ```sh
@@ -170,7 +170,6 @@ Have NodeJS and MongoDB installed on your machine.
 8. The frontend is now running at http://localhost:3000/  and backend is now running at http://localhost:8000/
 ---
 
-## Application Screenshots
 
 
 
