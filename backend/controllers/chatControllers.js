@@ -64,16 +64,17 @@ const fetchChats = asyncHandler(async (req, res) => {
       .populate("groupOwner", "-password")
       .populate("groupAdmin", "-password")
       .populate("latestMessage")
-      .sort({ updatedAt: -1 })
-      .populate({
-        path: "latestMessage.sender",
-        select: "name pic email",
-      });
+      .sort({ updatedAt: -1 });
 
-    if (!results) {
+    const populatedResults = await User.populate(results, {
+      path: "latestMessage.sender",
+      select: "name pic email",
+    });
+
+    if (!populatedResults) {
       return res.status(404).json({ message: "Chats not found" });
     }
-    const decryptedResults = results.map((result) => {
+    const decryptedResults = populatedResults.map((result) => {
       if (result.latestMessage) {
         const decryptedContent = CryptoJS.AES.decrypt(
           result.latestMessage.content,

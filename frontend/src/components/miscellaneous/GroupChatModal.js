@@ -59,7 +59,7 @@ const GroupChatModal = ({ children }) => {
         },
       };
       const { data } = await axios.get(`/api/user?search=${search}`, config);
-      
+
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -131,7 +131,7 @@ const GroupChatModal = ({ children }) => {
 
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent bg="dark.100" color="white" border="1px solid rgba(255,255,255,0.1)">
           <ModalHeader
             fontSize="35px"
             fontFamily="Work sans"
@@ -146,6 +146,8 @@ const GroupChatModal = ({ children }) => {
               <Input
                 placeholder="Chat Name"
                 mb={3}
+                variant="filled"
+                bg="whiteAlpha.100"
                 onChange={(e) => setGroupChatName(e.target.value)}
               />
             </FormControl>
@@ -153,6 +155,8 @@ const GroupChatModal = ({ children }) => {
               <Input
                 placeholder="Add Users eg: John, Piyush, Jane"
                 mb={1}
+                variant="filled"
+                bg="whiteAlpha.100"
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </FormControl>

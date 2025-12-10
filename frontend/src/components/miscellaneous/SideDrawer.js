@@ -126,32 +126,35 @@ function SideDrawer({ fetchAgain, setFetchAgain }) {
         d="flex"
         justifyContent="space-between"
         alignItems="center"
-        bg="white"
+        bg="rgba(23, 25, 35, 0.7)" // Darker glass
+        backdropFilter="blur(16px)"
         w="100%"
-        p="5px 10px 5px 10px"
-        borderWidth="5px"
+        p="10px 20px"
+        borderBottom="1px solid rgba(255, 255, 255, 0.1)"
+        zIndex={10}
+        position="relative"
       >
         <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
-          <Button variant="ghost" onClick={onOpen}>
+          <Button variant="ghost" onClick={onOpen} color="white" _hover={{ bg: "whiteAlpha.200" }}>
             <i className="fas fa-search"></i>
             <Text d={{ base: "none", md: "flex" }} px={4}>
               Search User
             </Text>
           </Button>
         </Tooltip>
-        <Text fontSize="2xl" fontFamily="Work sans" pr={{ base: "2" }}>
-          FliphoChatRoom
+        <Text fontSize="2xl" fontFamily="Work sans" pr={{ base: "2" }} fontWeight="bold" color="white" letterSpacing="wide">
+          FliphoChat
         </Text>
-        <Box d={{ base: "flex" }}>
+        <Box d={{ base: "flex" }} alignItems="center">
           <Menu>
-            <MenuButton p={{ md: "1" }}>
+            <MenuButton p={1} mr={2}>
               <NotificationBadge
                 count={notification.length}
                 effect={Effect.SCALE}
               />
-              <BellIcon fontSize="2xl" m={1} />
+              <BellIcon fontSize="2xl" m={1} color="white" />
             </MenuButton>
-            <MenuList pl={2}>
+            <MenuList pl={2} bg="gray.800" borderColor="gray.700" color="white">
               {!notification.length && "No New Messages"}
               {notification.map((notif) => (
                 <MenuItem
@@ -160,6 +163,8 @@ function SideDrawer({ fetchAgain, setFetchAgain }) {
                     setSelectedChat(notif.chat);
                     setNotification(notification.filter((n) => n !== notif));
                   }}
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
                 >
                   {notif.chat.isGroupChat
                     ? `New Message in ${notif.chat.chatName}`
@@ -170,28 +175,30 @@ function SideDrawer({ fetchAgain, setFetchAgain }) {
           </Menu>
           <Menu>
             <MenuButton
-              px={{ base: "1" }}
               as={Button}
-              bg="white"
-              rightIcon={<ChevronDownIcon />}
+              bg="transparent"
+              rightIcon={<ChevronDownIcon color="white" />}
+              _hover={{ bg: "whiteAlpha.200" }}
+              _active={{ bg: "whiteAlpha.200" }}
             >
               <Avatar
                 size="sm"
                 cursor="pointer"
                 name={user.name}
                 src={user.pic}
+                border="2px solid rgba(255,255,255,0.8)"
               />
             </MenuButton>
-            <MenuList>
+            <MenuList bg="gray.800" borderColor="gray.700" color="white">
               <MineprofileModal
                 user={user}
                 fetchAgain={fetchAgain}
                 setFetchAgain={setFetchAgain}
               >
-                <MenuItem>My Profile</MenuItem>{" "}
+                <MenuItem bg="gray.800" _hover={{ bg: "gray.700" }}>My Profile</MenuItem>{" "}
               </MineprofileModal>
               <MenuDivider />
-              <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+              <MenuItem onClick={logoutHandler} bg="gray.800" _hover={{ bg: "gray.700" }}>Logout</MenuItem>
             </MenuList>
           </Menu>
         </Box>
@@ -199,7 +206,7 @@ function SideDrawer({ fetchAgain, setFetchAgain }) {
 
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent bg="dark.900" color="white">
           <DrawerHeader borderBottomWidth="1px">Search Users</DrawerHeader>
           <DrawerBody>
             <Box d="flex" pb={2}>

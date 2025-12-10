@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    container_name: flipho_backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    networks:
+      - flipho-network
+
+  frontend:
+    build: ./frontend
+    container_name: flipho_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - flipho-network
+
+  mongo:
+    image: mongo
+    container_name: flipho_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - flipho-network
+
+networks:
+  flipho-network:
+    driver: bridge
+
+volumes:
+  mongo-data:

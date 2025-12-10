@@ -28,21 +28,33 @@ function Homepage() {
         d="flex"
         justifyContent="center"
         p={3}
-        bg="white"
+        bg="rgba(255, 255, 255, 0.08)"
         w="100%"
         m="40px 0 15px 0"
-        borderRadius="lg"
+        borderRadius="xl"
         borderWidth="1px"
+        borderColor="rgba(255, 255, 255, 0.1)"
+        backdropFilter="blur(12px)"
+        boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
       >
-        <Text fontSize="4xl" fontFamily="Work sans">
+        <Text fontSize="4xl" fontFamily="Work sans" color="white" fontWeight="bold">
           Flipho-Chat-Room
         </Text>
       </Box>
-      <Box bg="white" w="100%" p={4} borderRadius="lg" borderWidth="1px">
-        <Tabs isFitted variant="enclosed">
+      <Box
+        bg="rgba(255, 255, 255, 0.08)"
+        w="100%"
+        p={4}
+        borderRadius="xl"
+        borderWidth="1px"
+        borderColor="rgba(255, 255, 255, 0.1)"
+        backdropFilter="blur(12px)"
+        boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
+      >
+        <Tabs isFitted variant="soft-rounded" colorScheme="blue">
           <TabList mb="1em">
-            <Tab>Login</Tab>
-            <Tab>Sign Up</Tab>
+            <Tab color="white" _selected={{ color: "white", bg: "blue.500" }}>Login</Tab>
+            <Tab color="white" _selected={{ color: "white", bg: "blue.500" }}>Sign Up</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>

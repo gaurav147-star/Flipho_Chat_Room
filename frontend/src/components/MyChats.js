@@ -11,6 +11,7 @@ import { ChatState } from "../Context/ChatProvider";
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
+  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
@@ -40,7 +41,6 @@ const MyChats = ({ fetchAgain }) => {
   };
 
   useEffect(() => {
-    // setLoggedUser(user);
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
     // eslint-disable-next-line
@@ -50,37 +50,59 @@ const MyChats = ({ fetchAgain }) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
+  const getFilteredChats = () => {
+    if (!chats) return [];
+    if (!showUnreadOnly) return chats;
+    return chats.filter(chat =>
+      chat.latestMessage &&
+      !chat.latestMessage.readBy.includes(loggedUser?._id) &&
+      chat.latestMessage.sender._id !== loggedUser?._id
+    );
+  };
+
   return (
     <Box
       d={{ base: selectedChat ? "none" : "flex", md: "flex" }}
       flexDir="column"
       alignItems="center"
       p={3}
-      bg="white"
-      w={{ base: "100%", md: "28%" }}
-      borderRadius="lg"
-      borderWidth="1px"
+      bg="dark.panel"
+      w={{ base: "100%", md: "31%" }}
+      borderRadius="none"
+      borderRight="1px solid rgba(255,255,255,0.1)"
     >
       <Box
         pb={3}
-        px={{ base: "1", md: "2" }}
-        fontSize={{ base: "28px", md: "30px" }}
+        px={3}
+        fontSize={{ base: "28px", md: "24px" }}
         fontFamily="Work sans"
         d="flex"
         w="100%"
         justifyContent="space-between"
         alignItems="center"
+        color="white"
       >
-        <Box fontSize={{ base: "22px", md: "15px", lg: "17px" }}>My Chats</Box>
-        <Box>
+        My Chats
+        <Box d="flex" gap={2}>
+          <Button
+            onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+            size="sm"
+            fontSize="12px"
+            bg={showUnreadOnly ? "teal.500" : "whiteAlpha.200"}
+            color="white"
+            _hover={{ bg: showUnreadOnly ? "teal.600" : "whiteAlpha.300" }}
+          >
+            {showUnreadOnly ? "All Chats" : "Unread"}
+          </Button>
           <GroupChatModal>
             <Button
               d="flex"
-              fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+              size="sm"
+              fontSize="12px"
               rightIcon={<AddIcon />}
-              w={{ base: "100%", md: "90%", lg: "100%" }}
+              variant="solid"
             >
-              New Group Chat
+              New Group
             </Button>
           </GroupChatModal>
         </Box>
@@ -89,60 +111,70 @@ const MyChats = ({ fetchAgain }) => {
         d="flex"
         flexDir="column"
         p={3}
-        bg="#F8F8F8"
+        bg="rgba(0, 0, 0, 0.2)"
         w="100%"
         h="100%"
-        borderRadius="lg"
+        borderRadius="xl"
         overflowY="hidden"
       >
         {chats ? (
-          <Stack overflowY="scroll">
-            {chats.map((chat) => (
+          <Stack overflowY="scroll" spacing={3}>
+            {getFilteredChats().map((chat) => (
               <Box
                 onClick={() => setSelectedChat(chat)}
                 cursor="pointer"
-                bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
-                color={selectedChat === chat ? "white" : "black"}
+                bg={selectedChat === chat ? "#2a3942" : "transparent"}
+                color={"#e9edef"}
+                _hover={{
+                  bg: "#202c33",
+                }}
                 px={3}
-                py={2}
+                py={3}
                 borderRadius="lg"
                 key={chat._id}
                 d="flex"
+                alignItems="center"
+                transition="all 0.2s"
+                borderBottom="1px solid rgba(134, 150, 160, 0.15)"
               >
                 <Box d="flex" alignItems="center">
                   {!chat.isGroupChat ? (
                     <>
                       {getSenderPic(loggedUser, chat.users) ? (
-                        <Avatar src={getSenderPic(loggedUser, chat.users)} />
+                        <Avatar size="sm" src={getSenderPic(loggedUser, chat.users)} />
                       ) : (
-                        <Avatar src="https://bit.ly/broken-link" />
+                        <Avatar size="sm" src="https://bit.ly/broken-link" />
                       )}
                     </>
                   ) : (
                     <>
                       {chat.pic ? (
-                        <AvatarGroup size="md" max={2}>
+                        <AvatarGroup size="sm" max={2}>
                           <Avatar src={chat.pic} />
                           <Avatar src="https://bit.ly/broken-link" mx={-7} />
                         </AvatarGroup>
                       ) : (
-                        <Avatar src="https://bit.ly/broken-link" />
+                        <Avatar size="sm" src="https://bit.ly/broken-link" />
                       )}
                     </>
                   )}
                 </Box>
-                <Box ml={3}>
-                  <Text fontSize="xl">
+                <Box ml={3} w="100%">
+                  <Text fontSize="sm" fontWeight="bold">
                     {!chat.isGroupChat
                       ? getSender(loggedUser, chat.users) &&
-                        capitalizeFirstLetter(getSender(loggedUser, chat.users))
+                      capitalizeFirstLetter(getSender(loggedUser, chat.users))
                       : chat.chatName && capitalizeFirstLetter(chat.chatName)}
                   </Text>
                   {chat.latestMessage && (
-                    <Text fontSize="xs" color="#3a3a3a">
-                      {chat.latestMessage.content.length > 50
-                        ? chat.latestMessage.content.substring(0, 51) + "..."
-                        : chat.latestMessage.content}
+                    <Text fontSize="xs" color={selectedChat === chat ? "whiteAlpha.900" : "gray.400"} noOfLines={1}>
+                      <b style={{
+                        color: !chat.latestMessage.readBy.includes(loggedUser._id) ? "#80cbc4" : "inherit",
+                        fontWeight: !chat.latestMessage.readBy.includes(loggedUser._id) ? "bold" : "normal"
+                      }}>
+                        {chat.latestMessage.sender._id === loggedUser._id ? "You: " : chat.latestMessage.sender.name + ": "}
+                        {chat.latestMessage.content}
+                      </b>
                     </Text>
                   )}
                 </Box>

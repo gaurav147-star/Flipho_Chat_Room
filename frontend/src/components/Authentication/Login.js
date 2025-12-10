@@ -74,40 +74,69 @@ const Login = () => {
   return (
     <VStack spacing="10px">
       <FormControl id="email" isRequired>
-        <FormLabel>Email Address</FormLabel>
+        <FormLabel color="white">Email Address</FormLabel>
         <Input
           value={email}
           type="email"
           placeholder="Enter Your Email Address"
           onChange={(e) => setEmail(e.target.value)}
+          bg="whiteAlpha.200"
+          border="none"
+          color="white"
+          _placeholder={{ color: "gray.300" }}
+          _focus={{ bg: "whiteAlpha.300" }}
         />
       </FormControl>
       <FormControl id="password" isRequired>
-        <FormLabel>Password</FormLabel>
+        <FormLabel color="white">Password</FormLabel>
         <InputGroup size="md">
           <Input
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type={show ? "text" : "password"}
             placeholder="Enter password"
+            bg="whiteAlpha.200"
+            border="none"
+            color="white"
+            _placeholder={{ color: "gray.300" }}
+            _focus={{ bg: "whiteAlpha.300" }}
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? <ViewOffIcon /> : <ViewIcon />}
+            <Button h="1.75rem" size="sm" onClick={handleClick} variant="solid" bg="whiteAlpha.400" _hover={{ bg: "whiteAlpha.500" }}>
+              {show ? <ViewOffIcon color="white" /> : <ViewIcon color="white" />}
             </Button>
           </InputRightElement>
         </InputGroup>
       </FormControl>
       <Button
-        bg="#000"
-        width="30%"
-        _hover={{ bg: "#fff", color: "#000", border: "1px solid #000" }}
-        color="#fff"
+        colorScheme="blue"
+        width="100%"
         style={{ marginTop: 15 }}
         onClick={submitHandler}
         isLoading={loading}
+        borderRadius="full"
+        bgGradient="linear(to-r, blue.400, blue.600)"
+        _hover={{
+          bgGradient: "linear(to-r, blue.500, blue.700)",
+          boxShadow: "0 0 15px rgba(66, 153, 225, 0.6)"
+        }}
       >
         Login
+      </Button>
+      <Button
+        variant="solid"
+        colorScheme="red"
+        width="100%"
+        onClick={() => {
+          setEmail("guest@example.com");
+          setPassword("123456");
+        }}
+        borderRadius="full"
+        bg="whiteAlpha.200"
+        color="white"
+        _hover={{ bg: "whiteAlpha.300" }}
+      >
+        Get Guest User Credentials
       </Button>
     </VStack>
   );

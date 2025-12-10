@@ -137,46 +137,66 @@ const Signup = () => {
   return (
     <VStack spacing="5px">
       <FormControl id="first-name" isRequired>
-        <FormLabel>Name</FormLabel>
+        <FormLabel color="white">Name</FormLabel>
         <Input
           placeholder="Enter Your Name"
           onChange={(e) => setName(e.target.value)}
+          bg="whiteAlpha.200"
+          border="none"
+          color="white"
+          _placeholder={{ color: "gray.300" }}
+          _focus={{ bg: "whiteAlpha.300" }}
         />
       </FormControl>
       <FormControl id="email" isRequired>
-        <FormLabel>Email Address</FormLabel>
+        <FormLabel color="white">Email Address</FormLabel>
         <Input
           type="email"
           placeholder="Enter Your Email Address"
           onChange={(e) => setEmail(e.target.value)}
+          bg="whiteAlpha.200"
+          border="none"
+          color="white"
+          _placeholder={{ color: "gray.300" }}
+          _focus={{ bg: "whiteAlpha.300" }}
         />
       </FormControl>
       <FormControl id="password" isRequired>
-        <FormLabel>Password</FormLabel>
+        <FormLabel color="white">Password</FormLabel>
         <InputGroup size="md">
           <Input
             type={show ? "text" : "password"}
             placeholder="Enter Password"
             onChange={(e) => setPassword(e.target.value)}
+            bg="whiteAlpha.200"
+            border="none"
+            color="white"
+            _placeholder={{ color: "gray.300" }}
+            _focus={{ bg: "whiteAlpha.300" }}
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
-              {show ? <ViewOffIcon /> : <ViewIcon />}
+            <Button h="1.75rem" size="sm" onClick={() => setShow(!show)} variant="solid" bg="whiteAlpha.400" _hover={{ bg: "whiteAlpha.500" }}>
+              {show ? <ViewOffIcon color="white" /> : <ViewIcon color="white" />}
             </Button>
           </InputRightElement>
         </InputGroup>
       </FormControl>
       <FormControl id="password" isRequired>
-        <FormLabel>Confirm Password</FormLabel>
+        <FormLabel color="white">Confirm Password</FormLabel>
         <InputGroup size="md">
           <Input
             type={cshow ? "text" : "password"}
             placeholder="Confirm password"
             onChange={(e) => setConfirmpassword(e.target.value)}
+            bg="whiteAlpha.200"
+            border="none"
+            color="white"
+            _placeholder={{ color: "gray.300" }}
+            _focus={{ bg: "whiteAlpha.300" }}
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={() => setCshow(!cshow)}>
-              {cshow ? <ViewOffIcon /> : <ViewIcon />}
+            <Button h="1.75rem" size="sm" onClick={() => setCshow(!cshow)} variant="solid" bg="whiteAlpha.400" _hover={{ bg: "whiteAlpha.500" }}>
+              {cshow ? <ViewOffIcon color="white" /> : <ViewIcon color="white" />}
             </Button>
           </InputRightElement>
         </InputGroup>
@@ -191,13 +211,17 @@ const Signup = () => {
         />
       </FormControl>
       <Button
-        bg="#000"
-        width="30%"
-        _hover={{ bg: "#fff", color: "#000", border: "1px solid #000" }}
-        color="#fff"
+        colorScheme="blue"
+        width="100%"
         style={{ marginTop: 15 }}
         onClick={submitHandler}
         isLoading={picLoading}
+        borderRadius="full"
+        bgGradient="linear(to-r, blue.400, blue.600)"
+        _hover={{
+          bgGradient: "linear(to-r, blue.500, blue.700)",
+          boxShadow: "0 0 15px rgba(66, 153, 225, 0.6)"
+        }}
       >
         Sign Up
       </Button>

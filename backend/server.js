@@ -20,6 +20,8 @@ app.use(express.json()); // to accept json data
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/api/list", require("./routes/listRoutes"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // --------------------------deployment------------------------------
 
@@ -53,9 +55,8 @@ const server = app.listen(
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    // origin: "http://localhost:3000",
-    origin: "https://fliphochat.onrender.com/",
-    // credentials: true,
+    origin: ["http://localhost:3000", "https://fliphochat.onrender.com/"],
+    credentials: true,
   },
 });
 

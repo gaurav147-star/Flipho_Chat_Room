@@ -13,11 +13,59 @@ import {
   Box,
 } from "@chakra-ui/react";
 import React from "react";
-import { ViewIcon } from "@chakra-ui/icons";
+import { ViewIcon, EditIcon } from "@chakra-ui/icons";
+import { useState } from "react";
+import axios from "axios";
+import { useToast, Button, Input, FormControl, FormLabel } from "@chakra-ui/react";
 
 const ProfileModal = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(user.name);
+  const [pic, setPic] = useState(user.pic);
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+
+  const handleUpdate = async () => {
+    setLoading(true);
+    try {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        "/api/user/update",
+        { userId: user._id, name, pic },
+        config
+      );
+
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setLoading(false);
+      setIsEditing(false);
+      toast({
+        title: "Profile Updated",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      window.location.reload(); // Force reload to reflect changes everywhere
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
   return (
     <>
       {children ? (
@@ -60,8 +108,28 @@ const ProfileModal = ({ user, children }) => {
             alignItems="center"
             pt={10}
           >
-            <Box fontSize="35px">{user.name}</Box>
-            <Box> {user.email}</Box>
+            {isEditing ? (
+              <FormControl>
+                <Input
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  mb={2}
+                  color="white"
+                />
+                <Input
+                  placeholder="Pic URL"
+                  value={pic}
+                  onChange={(e) => setPic(e.target.value)}
+                  color="white"
+                />
+              </FormControl>
+            ) : (
+              <>
+                <Box fontSize="35px">{name}</Box>
+                <Box> {user.email}</Box>
+              </>
+            )}
           </DrawerHeader>
 
           <DrawerBody d="flex" flexDir="column" alignItems="center">
@@ -73,7 +141,18 @@ const ProfileModal = ({ user, children }) => {
               color="#7e7e7e"
             ></Text>
           </DrawerBody>
-          <DrawerFooter></DrawerFooter>
+          <DrawerFooter>
+            {isEditing ? (
+              <Button colorScheme="blue" mr={3} onClick={handleUpdate} isLoading={loading}>
+                Save
+              </Button>
+            ) : (
+              <Button variant="ghost" mr={3} onClick={() => setIsEditing(true)}>
+                <EditIcon /> Edit
+              </Button>
+            )}
+            {isEditing && <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>}
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>
