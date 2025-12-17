@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
 const CryptoJS = require("crypto-js");
+const { getOrCreateAIUser } = require("../config/aiUser");
 
 //@description     Create or fetch One to One Chat
 //@route           POST /api/chat/
@@ -12,6 +13,16 @@ const accessChat = asyncHandler(async (req, res) => {
   if (!userId) {
     console.log("UserId param not sent with request");
     return res.sendStatus(400);
+  }
+
+  // Check if userId is AI user
+  const targetUser = await User.findById(userId);
+  if (targetUser && targetUser.isAI) {
+    // Ensure AI user exists
+    const aiUser = await getOrCreateAIUser();
+    if (userId !== aiUser._id.toString()) {
+      return res.status(400).json({ message: "Invalid AI user ID" });
+    }
   }
 
   var isChat = await Chat.find({
@@ -26,7 +37,7 @@ const accessChat = asyncHandler(async (req, res) => {
 
   isChat = await User.populate(isChat, {
     path: "latestMessage.sender",
-    select: "name pic email",
+    select: "name pic email isAI",
   });
 
   if (isChat.length > 0) {
@@ -57,9 +68,33 @@ const accessChat = asyncHandler(async (req, res) => {
 //@access          Protected
 const fetchChats = asyncHandler(async (req, res) => {
   try {
-    const results = await Chat.find({
-      users: { $elemMatch: { $eq: req.user._id } },
+    // Get or create AI user
+    const aiUser = await getOrCreateAIUser();
+
+    // First, directly query for existing AI chat using MongoDB query (more reliable)
+    const existingAIChat = await Chat.findOne({
+      isGroupChat: false,
+      $and: [
+        { users: { $elemMatch: { $eq: req.user._id } } },
+        { users: { $elemMatch: { $eq: aiUser._id } } },
+      ],
     })
+      .populate("users", "-password")
+      .populate("latestMessage");
+
+    console.log(`User ${req.user._id}: Existing AI chat found: ${existingAIChat ? existingAIChat._id : 'none'}`);
+
+    // Get all user chats (excluding the AI chat if it exists, to avoid duplicates)
+    const otherChatsQuery = {
+      users: { $elemMatch: { $eq: req.user._id } },
+    };
+    
+    // If AI chat exists, exclude it from the query
+    if (existingAIChat) {
+      otherChatsQuery._id = { $ne: existingAIChat._id };
+    }
+
+    const results = await Chat.find(otherChatsQuery)
       .populate("users", "-password")
       .populate("groupOwner", "-password")
       .populate("groupAdmin", "-password")
@@ -68,22 +103,60 @@ const fetchChats = asyncHandler(async (req, res) => {
 
     const populatedResults = await User.populate(results, {
       path: "latestMessage.sender",
-      select: "name pic email",
+      select: "name pic email isAI",
     });
 
-    if (!populatedResults) {
-      return res.status(404).json({ message: "Chats not found" });
+    // If no AI chat exists, create it
+    let aiChat = existingAIChat;
+    if (!aiChat) {
+      try {
+        console.log(`User ${req.user._id}: Creating new AI chat`);
+        aiChat = await Chat.create({
+          chatName: "sender",
+          isGroupChat: false,
+          users: [req.user._id, aiUser._id],
+        });
+        aiChat = await Chat.findOne({ _id: aiChat._id })
+          .populate("users", "-password")
+          .populate("latestMessage");
+        console.log(`User ${req.user._id}: Created AI chat ${aiChat._id}`);
+      } catch (error) {
+        console.error("Error creating AI chat:", error);
+      }
     }
-    const decryptedResults = populatedResults.map((result) => {
-      if (result.latestMessage) {
-        const decryptedContent = CryptoJS.AES.decrypt(
-          result.latestMessage.content,
-          process.env.SECRET_KEY
-        ).toString(CryptoJS.enc.Utf8);
-        result.latestMessage.content = decryptedContent;
+
+    // Populate latestMessage sender for AI chat if it exists
+    if (aiChat && aiChat.latestMessage) {
+      aiChat = await User.populate(aiChat, {
+        path: "latestMessage.sender",
+        select: "name pic email isAI",
+      });
+    }
+
+    // Combine results: AI chat first (if exists), then other chats
+    let allChats = populatedResults || [];
+    if (aiChat) {
+      // Put AI chat at the beginning
+      allChats = [aiChat, ...allChats];
+    }
+
+    // Decrypt messages
+    const decryptedResults = allChats.map((result) => {
+      if (result.latestMessage && result.latestMessage.content) {
+        try {
+          const decryptedContent = CryptoJS.AES.decrypt(
+            result.latestMessage.content,
+            process.env.SECRET_KEY
+          ).toString(CryptoJS.enc.Utf8);
+          result.latestMessage.content = decryptedContent;
+        } catch (error) {
+          // If decryption fails, keep original content
+          console.error("Decryption error:", error);
+        }
       }
       return result;
     });
+
     res.status(200).json(decryptedResults);
   } catch (error) {
     res.status(400).json({ message: error.message });

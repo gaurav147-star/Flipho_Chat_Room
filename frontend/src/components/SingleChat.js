@@ -71,14 +71,25 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         `/api/message/${selectedChat._id}`,
         config
       );
-      setMessages(data);
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setMessages(data);
+        console.log(`Loaded ${data.length} messages for chat ${selectedChat._id}`);
+      } else {
+        console.error("Invalid message data format:", data);
+        setMessages([]);
+      }
+      
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
     } catch (error) {
+      console.error("Error fetching messages:", error);
+      setLoading(false);
       toast({
         title: "Error Occured!",
-        description: "Failed to Load the Messages",
+        description: error.response?.data?.message || "Failed to Load the Messages",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -189,10 +200,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         selectedChatCompare &&
         selectedChatCompare._id === newMessageRecieved.chat._id
       ) {
-        setMessages([...messages, newMessageRecieved]);
+        setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
       }
     });
-  });
+
+    return () => {
+      socket.off("message recieved");
+    };
+  }, [messages]);
   useEffect(() => {
     if (!selectedChat || selectedChat.isGroupChat) return;
 

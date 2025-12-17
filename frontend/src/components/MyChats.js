@@ -3,7 +3,7 @@ import { Box, Stack, Text } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { getSender, getSenderPic } from "../config/ChatLogics";
+import { getSender, getSenderPic, isAIChat } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { Button, Avatar, AvatarGroup } from "@chakra-ui/react";
@@ -52,12 +52,27 @@ const MyChats = ({ fetchAgain }) => {
 
   const getFilteredChats = () => {
     if (!chats) return [];
-    if (!showUnreadOnly) return chats;
-    return chats.filter(chat =>
-      chat.latestMessage &&
-      !chat.latestMessage.readBy.includes(loggedUser?._id) &&
-      chat.latestMessage.sender._id !== loggedUser?._id
-    );
+    
+    // Separate AI chat and other chats
+    const aiChat = chats.find((chat) => isAIChat(chat, loggedUser));
+    const otherChats = chats.filter((chat) => !isAIChat(chat, loggedUser));
+    
+    // Apply unread filter if enabled
+    let filteredChats = showUnreadOnly
+      ? otherChats.filter(
+          (chat) =>
+            chat.latestMessage &&
+            !chat.latestMessage.readBy.includes(loggedUser?._id) &&
+            chat.latestMessage.sender._id !== loggedUser?._id
+        )
+      : otherChats;
+    
+    // Always include AI chat at the top if it exists
+    if (aiChat) {
+      filteredChats = [aiChat, ...filteredChats];
+    }
+    
+    return filteredChats;
   };
 
   return (

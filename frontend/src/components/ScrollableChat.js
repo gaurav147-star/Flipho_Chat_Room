@@ -3,6 +3,7 @@ import { Tooltip } from "@chakra-ui/tooltip";
 import ScrollableFeed from "react-scrollable-feed";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useState } from "react";
 import {
   isLastMessage,
   isSameSender,
@@ -13,6 +14,8 @@ import { ChatState } from "../Context/ChatProvider";
 
 const ScrollableChat = ({ messages }) => {
   const { user, selectedChat } = ChatState();
+  const [expandedMessages, setExpandedMessages] = useState(new Set());
+  const MAX_MESSAGE_LENGTH = 300; // Characters before showing "read more"
 
   const handleReaction = async (messageId) => {
     try {
@@ -36,6 +39,81 @@ const ScrollableChat = ({ messages }) => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const toggleMessageExpansion = (messageId) => {
+    setExpandedMessages((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(messageId)) {
+        newSet.delete(messageId);
+      } else {
+        newSet.add(messageId);
+      }
+      return newSet;
+    });
+  };
+
+  const renderMessageContent = (message) => {
+    const isExpanded = expandedMessages.has(message._id);
+    const messageContent = message.content || '';
+    const isLong = messageContent.length > MAX_MESSAGE_LENGTH;
+    // Only show read more for other side's messages (not user's own messages)
+    const senderId = message.sender?._id || message.sender;
+    const userId = user?._id || user;
+    const isOtherSide = senderId && userId && String(senderId) !== String(userId);
+
+    // If message is not long or it's from the user, show full content
+    if (!isLong || !isOtherSide) {
+      return <span style={{ position: 'relative', zIndex: 1, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{messageContent}</span>;
+    }
+
+    const buttonStyle = {
+      marginTop: '8px',
+      padding: '4px 8px',
+      background: 'transparent',
+      border: 'none',
+      color: '#00a884',
+      cursor: 'pointer',
+      fontSize: '12px',
+      fontWeight: '500',
+      textDecoration: 'underline',
+      display: 'block',
+      transition: 'opacity 0.2s ease',
+    };
+
+    if (isExpanded) {
+      return (
+        <>
+          <span style={{ position: 'relative', zIndex: 1, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{messageContent}</span>
+          <button
+            onClick={() => toggleMessageExpansion(message._id)}
+            onMouseEnter={(e) => e.target.style.opacity = '0.8'}
+            onMouseLeave={(e) => e.target.style.opacity = '1'}
+            style={buttonStyle}
+          >
+            Read less
+          </button>
+        </>
+      );
+    }
+
+    const truncatedText = messageContent.substring(0, MAX_MESSAGE_LENGTH);
+    return (
+      <>
+        <span style={{ position: 'relative', zIndex: 1, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+          {truncatedText}
+          <span style={{ opacity: 0.7 }}>...</span>
+        </span>
+        <button
+          onClick={() => toggleMessageExpansion(message._id)}
+          onMouseEnter={(e) => e.target.style.opacity = '0.8'}
+          onMouseLeave={(e) => e.target.style.opacity = '1'}
+          style={buttonStyle}
+        >
+          Read more
+        </button>
+      </>
+    );
   };
 
   return (
@@ -79,7 +157,7 @@ const ScrollableChat = ({ messages }) => {
               }}
             >
               {m.image && <img src={m.image.startsWith("http") || m.image.startsWith("/") ? m.image : `/${m.image}`} alt="attachment" style={{ borderRadius: "14px", marginBottom: "8px", maxWidth: "240px", border: "1px solid rgba(255,255,255,0.1)" }} />}
-              <span style={{ position: 'relative', zIndex: 1 }}>{m.content}</span>
+              {renderMessageContent(m)}
               {m.reactions && m.reactions.length > 0 && (
                 <div style={{ fontSize: "12px", marginTop: "4px", display: "flex", justifyContent: "flex-end", gap: "2px" }}>
                   {m.reactions.map((r, idx) => (

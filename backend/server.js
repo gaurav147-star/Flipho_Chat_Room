@@ -6,9 +6,20 @@ const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const path = require("path");
+const { getOrCreateAIUser } = require("./config/aiUser");
 
 dotenv.config();
 connectDB();
+
+// Initialize AI user on startup
+getOrCreateAIUser()
+  .then((aiUser) => {
+    console.log("AI User ready:", aiUser.name);
+  })
+  .catch((error) => {
+    console.error("Failed to initialize AI user:", error);
+  });
+
 const app = express();
 
 app.use(express.json()); // to accept json data
@@ -21,6 +32,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/list", require("./routes/listRoutes"));
+app.use("/api/ai", require("./routes/aiRoutes"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // --------------------------deployment------------------------------
@@ -59,6 +71,9 @@ const io = require("socket.io")(server, {
     credentials: true,
   },
 });
+
+// Make io available to controllers via app
+app.set("io", io);
 
 const onlineUsers = {}; // Maintain a dictionary of online users
 
